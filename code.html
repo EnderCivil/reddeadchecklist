@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDR2 Checklist</title>
+<style>
+  body {
+    background: #111;
+    color: #e6e0d0;
+    font-family: "Times New Roman", serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Progress bar */
+  .progress-container {
+    background: #1a1a1a;
+    padding: 10px 20px;
+    border-bottom: 2px solid #333;
+  }
+
+  .progress-bar {
+    height: 18px;
+    background: #2b2b2b;
+    border: 1px solid #555;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6b2b10, #a34f28);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .progress-text {
+    font-size: 14px;
+    text-align: right;
+    margin-top: 5px;
+    color: #aaa;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: #2b1e14;
+    border-bottom: 2px solid #3c2a1f;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    border-right: 1px solid #3c2a1f;
+    background: #3a2a1f;
+    color: #d7c9a4;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  .tab:hover {
+    background: #473426;
+  }
+
+  .tab.active {
+    background: #2b1e14;
+    box-shadow: inset 0 -3px 0 #a34f28;
+  }
+
+  .tab.gold {
+    background: linear-gradient(90deg, #5c4520, #b08d57, #5c4520);
+    color: #fff5d9;
+    text-shadow: 0 0 5px rgba(255, 215, 100, 0.4);
+  }
+
+  /* Layout */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    width: 40%;
+    background: #1a1a1a;
+    overflow-y: auto;
+    padding: 15px;
+  }
+
+  .sidebar-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .sidebar input[type="text"] {
+    width: 70%;
+    padding: 6px;
+    background: #222;
+    border: 1px solid #444;
+    color: #ddd;
+  }
+
+  .sidebar button {
+    padding: 6px 10px;
+    background: #333;
+    color: #ddd;
+    border: 1px solid #444;
+    cursor: pointer;
+  }
+
+  .sidebar button:hover {
+    background: #444;
+  }
+
+  .detail-panel {
+    width: 60%;
+    background: #181818;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .detail-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(5px) brightness(0.4);
+    z-index: 0;
+  }
+
+  .detail-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Collapsible Lists */
+  .collapsible {
+    margin-bottom: 10px;
+    border: 1px solid #333;
+    overflow: hidden;
+    position: relative;
+    border-radius: 4px;
+  }
+
+  .collapsible-header {
+    cursor: pointer;
+    padding: 8px;
+    background: rgba(25,25,25,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+
+  .collapsible-header:hover {
+    border: 1px solid #a34f28;
+  }
+
+  .collapsible-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(4px) brightness(0.3);
+    z-index: 1;
+  }
+
+  .collapsible-content {
+    display: none;
+    padding-left: 20px;
+    border-left: 2px solid #333;
+    background: rgba(15,15,15,0.8);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .collapsible-content.open {
+    display: block;
+  }
+
+  .collapsible.gold .collapsible-header {
+    background: linear-gradient(90deg, #5c4520, #b08d57, #5c4520);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Checklist Items */
+  .item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+    margin: 5px 0;
+    border: 1px solid #333;
+    background: #1f1f1f;
+    position: relative;
+    z-index: 2;
+  }
+
+  .item:hover {
+    border: 1px solid #a34f28;
+    background: #2a2a2a;
+  }
+
+  .item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 1px solid #555;
+  }
+
+  .item.completed label {
+    text-decoration: line-through;
+    color: #777;
+  }
+
+  /* Detail Panel */
+  .detail-header {
+    padding: 40px;
+    color: #fff;
+    text-shadow: 2px 2px 4px black;
+  }
+
+  .detail-header h2 {
+    font-size: 26px;
+    margin: 0;
+  }
+
+  .detail-body {
+    padding: 20px;
+    background: rgba(25,25,25,0.8);
+  }
+
+  .detail-thumbnail {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 2px solid #444;
+  }
+
+  .gold-requirements {
+    margin-top: 15px;
+    border-left: 3px solid #b08d57;
+    padding-left: 10px;
+  }
+
+  .gold-requirements h3 {
+    color: #d4af37;
+    margin: 0 0 8px 0;
+  }
+</style>
+</head>
+<body>
+  <!-- Progress bar -->
+  <div class="progress-container">
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+    <div class="progress-text">0% Complete</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="all">All</div>
+    <div class="tab" data-tab="missions">Missions & Events</div>
+    <div class="tab" data-tab="collectables">Collectables</div>
+    <div class="tab" data-tab="compendium">Compendium</div>
+    <div class="tab" data-tab="player">Player</div>
+    <div class="tab" data-tab="misc">Misc</div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-controls">
+        <input type="text" id="search" placeholder="Search...">
+        <button id="toggleAll">Expand All</button>
+      </div>
+
+      <!-- Example collapsible with background -->
+      <div class="collapsible" data-category="missions all" data-bg="https://i.imgur.com/O9f1gVJ.jpg">
+        <div class="collapsible-bg" style="background-image: url('https://i.imgur.com/O9f1gVJ.jpg');"></div>
+        <div class="collapsible-header">
+          <label><input type="checkbox" class="parent-check"> Chapter 1</label>
+          <span class="counter">0/1</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="item" data-title="Outlaws from the West" data-img="https://i.imgur.com/mF5YrUv.jpg" data-desc="The first mission of the game during a snowstorm." data-gold='["Complete within 15 minutes 30 seconds","Get 80% accuracy","Headshot 6 enemies"]'>
+            <input type="checkbox"> <img src="https://i.imgur.com/mF5YrUv.jpg"><label>Outlaws from the West</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel">
+      <div class="detail-bg"></div>
+      <div class="detail-content">
+        <div class="detail-header"><h2>Select an Item</h2></div>
+        <div class="detail-body"><p>Details will appear here when you click an item.</p></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Restore state from localStorage
+  window.addEventListener("load", () => {
+    const saved = JSON.parse(localStorage.getItem("rdr2progress")) || {};
+    document.querySelectorAll("input[type=checkbox]").forEach((cb, i) => {
+      cb.checked = saved[i] || false;
+    });
+    updateCounters();
+    updateProgress();
+  });
+
+  const tabs = document.querySelectorAll(".tab");
+  const collapsibles = document.querySelectorAll(".collapsible");
+
+  // Tabs
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      const selected = tab.dataset.tab;
+      collapsibles.forEach(c => {
+        if (selected === "all" || c.dataset.category.includes(selected)) {
+          c.style.display = "block";
+        } else {
+          c.style.display = "none";
+        }
+      });
+    });
+  });
+
+  // Collapsibles
+  document.querySelectorAll(".collapsible-header").forEach(header => {
+    header.addEventListener("click", (e) => {
+      if (e.target.tagName.toLowerCase() !== "input") {
+        const content = header.nextElementSibling;
+        content.classList.toggle("open");
+      }
+    });
+  });
+
+  // Detail panel
+  const detailPanel = document.querySelector(".detail-panel .detail-bg");
+  const detailTitle = document.querySelector(".detail-header h2");
+  const detailBody = document.querySelector(".detail-body");
+
+  document.querySelectorAll(".item").forEach(item => {
+    item.addEventListener("click", (e) => {
+      if (e.target.tagName.toLowerCase() !== "input") {
+        detailTitle.textContent = item.dataset.title;
+
+        // Background from collapsible
+        const collapsible = item.closest(".collapsible");
+        if (collapsible) {
+          detailPanel.style.backgroundImage = `url(${collapsible.dataset.bg})`;
+        }
+
+        let html = `<img src="${item.dataset.img}" class="detail-thumbnail">`;
+        html += `<p>${item.dataset.desc}</p>`;
+        if (item.dataset.gold) {
+          const reqs = JSON.parse(item.dataset.gold);
+          html += `<div class="gold-requirements"><h3>Gold Medal Requirements</h3><ul>`;
+          reqs.forEach(r => html += `<li>${r}</li>`);
+          html += `</ul></div>`;
+        }
+        detailBody.innerHTML = html;
+      }
+    });
+  });
+
+  // Checkboxes logic + localStorage
+  function updateProgress() {
+    const allChecks = document.querySelectorAll(".item input");
+    const checked = document.querySelectorAll(".item input:checked");
+    const percent = allChecks.length ? Math.round((checked.length / allChecks.length) * 100) : 0;
+    document.querySelector(".progress-fill").style.width = percent + "%";
+    document.querySelector(".progress-text").textContent = percent + "% Complete";
+
+    const state = {};
+    document.querySelectorAll("input[type=checkbox]").forEach((cb, i) => {
+      state[i] = cb.checked;
+    });
+    localStorage.setItem("rdr2progress", JSON.stringify(state));
+  }
+
+  function updateCounters() {
+    document.querySelectorAll(".collapsible").forEach(c => {
+      const items = c.querySelectorAll(".item input");
+      const checked = c.querySelectorAll(".item input:checked");
+      const counter = c.querySelector(".counter");
+      if (counter) counter.textContent = `${checked.length}/${items.length}`;
+
+      if (items.length > 0 && checked.length === items.length) {
+        c.classList.add("gold");
+      } else {
+        c.classList.remove("gold");
+      }
+    });
+
+    tabs.forEach(tab => {
+      const selected = tab.dataset.tab;
+      let relevantCollapsibles = selected === "all" ? collapsibles : [...collapsibles].filter(c => c.dataset.category.includes(selected));
+      let allComplete = relevantCollapsibles.every(c => {
+        const items = c.querySelectorAll(".item input");
+        const checked = c.querySelectorAll(".item input:checked");
+        return items.length > 0 && items.length === checked.length;
+      });
+      if (allComplete && relevantCollapsibles.length > 0) {
+        tab.classList.add("gold");
+      } else {
+        tab.classList.remove("gold");
+      }
+    });
+  }
+
+  document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const parent = cb.closest(".collapsible");
+      if (cb.classList.contains("parent-check")) {
+        const childChecks = parent.querySelectorAll(".collapsible-content input[type=checkbox]");
+        childChecks.forEach(c => c.checked = cb.checked);
+      }
+      updateCounters();
+      updateProgress();
+    });
+  });
+
+  // Search filter
+  document.getElementById("search").addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll(".item").forEach(item => {
+      item.style.display = item.dataset.title.toLowerCase().includes(q) ? "flex" : "none";
+    });
+  });
+
+  // Expand/Collapse all
+  let expanded = false;
+  document.getElementById("toggleAll").addEventListener("click", () => {
+    expanded = !expanded;
+    document.querySelectorAll(".collapsible-content").forEach(c => {
+      c.classList.toggle("open", expanded);
+    });
+    document.getElementById("toggleAll").textContent = expanded ? "Collapse All" : "Expand All";
+  });
+
+  updateCounters();
+  updateProgress();
+</script>
+</body>
+</html>
